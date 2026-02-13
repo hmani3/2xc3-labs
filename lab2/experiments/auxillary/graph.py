@@ -91,3 +91,4 @@ def MVC(G):
     return min_cover
 
 
+#BFS DFS VARIATIONS
