@@ -22,8 +22,9 @@ class Graph:
             self.adj[node1].append(node2)
             self.adj[node2].append(node1)
 
-    def number_of_nodes():
-        return len()
+    # had to fix this, dont know what was intended here
+    def number_of_nodes(self):
+        return len(self.adj)
 
 
 #Breadth First Search
@@ -81,7 +82,8 @@ def is_vertex_cover(G, C):
     return True
 
 def MVC(G):
-    nodes = [i for i in range(G.get_size())]
+    # the implementation used get_size (?) doesnt exist replaced it with the probably intended number_of_nodes
+    nodes = [i for i in range(G.number_of_nodes())]
     subsets = power_set(nodes)
     min_cover = nodes
     for subset in subsets:
