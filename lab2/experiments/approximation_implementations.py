@@ -29,21 +29,13 @@ def approx1(G: Graph) -> Graph:
 # implementation 2
 def approx2(G: Graph) -> Graph:
     C = set()
-    new_g = deepcopy(G)
-    while not is_vertex_cover(new_g, C):
+    while not is_vertex_cover(G, C):
         # calculate availble nodesfrom python set subtraction and choose random
-        available = set([key for key in new_g]) - C
-        u = choice(available)
+        available = set(G.adj.keys()) - C
+        u = choice(list(available))
         # add the random to our set and remove from graph
         C.add(u)
     return C
-
-g = create_random_graph(20, 5)
-vc = approx1(g)
-mvc = MVC(g)
-print_graph(g)
-print("Vertex covers: ", vc, mvc)
-print("Our VC is a MVC:", len(vc) == len(mvc))
 
 # implementation 3
 def approx3(G: Graph) -> Graph:
@@ -62,18 +54,8 @@ def approx3(G: Graph) -> Graph:
         C.add(v)
 
         for n in new_g.adj[u]: new_g.adj[n].remove(u)
-        # delete node after
         del new_g.adj[u]
         
-        for n in new_g.adj[u]: new_g.adj[n].remove(v)
-        # delete node after
+        for n in new_g.adj[v]: new_g.adj[n].remove(v)
         del new_g.adj[v]
     return C
-
-
-g = create_random_graph(20, 5)
-vc = approx1(g)
-mvc = MVC(g)
-print_graph(g)
-print("Vertex covers: ", vc, mvc)
-print("Our VC is a MVC:", len(vc) == len(mvc))
