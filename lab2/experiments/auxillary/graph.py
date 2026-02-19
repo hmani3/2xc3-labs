@@ -172,10 +172,11 @@ def has_cycle (G):
                 current_node, parent_node = S.pop()
                 if current_node in visited:
                     # we have a cycle if we see a visited node that is not our parent
-                    if current_node != parent_node: return True
+                    return True
                 else:
                     visited.add(current_node)
-                    for neighbor in G.adj[current_node]: S.append((neighbor, current_node))
+                    for neighbor in G.adj[current_node]:
+                        if neighbor != parent_node: S.append((neighbor, current_node))
     return False
 
 # CONNECTIVITY DETECTION
