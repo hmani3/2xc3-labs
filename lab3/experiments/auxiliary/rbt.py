@@ -11,7 +11,7 @@ def fix(self, node):
                 uncle = grandparent.right
 
                 if uncle is not None and uncle.is_red():
-                    # Case 1: Uncle is red, recolour and move violation up
+                    # uncle is red, recolour and move violation up
                     parent.make_black()
                     uncle.make_black()
                     grandparent.make_red()
@@ -19,12 +19,12 @@ def fix(self, node):
 
                 else:
                     if node.is_right_child():
-                        # Case 2: Triangle (inner child), rotate to straighten into a line
+                        # tiangle (inner child), rotate to straighten into a line
                         node = parent
                         node.rotate_left()
                         parent = node.parent
 
-                    # Case 3: Line (outer child), rotate grandparent and recolour
+                    # line (outer child), rotate grandparent and recolour
                     parent.make_black()
                     grandparent.make_red()
                     if grandparent.parent is None:
@@ -58,17 +58,3 @@ def fix(self, node):
 
         self.root.make_black()
                         
-            
-        def __str__(self):
-            if self.is_empty():
-                return "[]"
-            return "[" + self.__str_helper(self.root) + "]"
-
-        def __str_helper(self, node):
-            if node.is_leaf():
-                return "[" + str(node) + "]"
-            if node.left == None:
-                return "[" + str(node) + " -> " + self.__str_helper(node.right) + "]"
-            if node.right == None:
-                return "[" +  self.__str_helper(node.left) + " <- " + str(node) + "]"
-            return "[" + self.__str_helper(node.left) + " <- " + str(node) + " -> " + self.__str_helper(node.right) + "]"

@@ -9,9 +9,6 @@ class RBNode:
         self.parent = None
         self.colour = "R"
 
-    def get_uncle(self):
-        return
-
     def is_leaf(self):
         return self.left == None and self.right == None
 
