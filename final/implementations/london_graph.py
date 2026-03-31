@@ -66,7 +66,7 @@ class LondonTubeGraph(DirectedWeightedGraph):
         return self.station_info[station_id]['lat'], self.station_info[station_id]['lon']
     
     def calculate_max_speed(self):
-        # calculate the maximum speed of travel in km / min across all connections, to be used in heuristic calculation
+        """ calculate the maximum speed of travel in km / min across all connections, to be used in heuristic calculation """
         max_speed_kmm = 0
         best = (-1, -1, -1)
         
@@ -97,7 +97,7 @@ class LondonTubeGraph(DirectedWeightedGraph):
         return  (dis / max_speed_kmm) if max_speed_kmm > 0 else float('inf')
 
     def create_heuristic_dict(self):
-        #  returns a dictionary res where res[u] = the heurestic function starting at node u
+        """ returns a dictionary res where res[u] = the heurestic function starting at node u """
         res = dict()
         max_speed, _ = self.calculate_max_speed()
 
@@ -110,6 +110,7 @@ class LondonTubeGraph(DirectedWeightedGraph):
 
     
     def print_station(self,station_id):
+        """ Print for testing and debugging"""
         info = self.station_info[station_id]
         print(f"[{station_id}] {info['name']} (Zone {info['zone']})")
         
