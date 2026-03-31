@@ -1,5 +1,6 @@
 import csv, math
 from collections import defaultdict
+from .final_project_part1 import DirectedWeightedGraph
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Calculate the  distance in km between two points w lat lon, use in heurestic."""
@@ -15,14 +16,13 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
     return R * c
 
-class LondonTubeGraph():
+class LondonTubeGraph(DirectedWeightedGraph):
 
     def __init__(self):
-        # adj_list[station_id] = (neighbour_id, time, line)
-        self.adj_list = defaultdict(list)
-
+        super().__init__()
         # station_info[station_id] = {name,lat,lon,zone,total_lines,display,rail}
         self.station_info = {}
+        self.lines = {}
 
     def load_stations(self, stations_file):
         """Read londan_stations.csv, load station information to station_info"""
@@ -30,6 +30,10 @@ class LondonTubeGraph():
             reader = csv.DictReader(file)
             for row in reader:
                 station_id = int(row['id'])
+                
+                # add station_id node to dwg
+                self.add_node(station_id)
+                
                 self.station_info[station_id] = {
                     'name': row['name'],
                     'lat': float(row['latitude']),
@@ -45,36 +49,40 @@ class LondonTubeGraph():
         with open(connections_file, mode='r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             for row in reader:
-                # stations are nodes 'u', 'v'
                 u = int(row['station1'])
                 v = int(row['station2'])
-                # weight by time for edge, in minutes from u to v or v to u
                 weight = int(row['time'])
-                # line taken (wil be used for analysis)
                 line = int(row['line'])
                 
-                # Tube connections are bidirectional (undirected graph, we can go both ways for any 2 stations)
-                self.adj_list[u].append((v, weight, line))
-                self.adj_list[v].append((u, weight, line))
+                # Use parent methods to add bidirectional edgese
+                self.add_edge(u, v, weight)
+                self.add_edge(v, u, weight)
+                
+                # Store the line information in custom dictionary (analysis)
+                self.lines[(u, v)] = line
+                self.lines[(v, u)] = line
 
-    def get_neighbors(self, station_id):
-        return self.adj_list[station_id]
     def get_coords(self, station_id):
         return self.station_info[station_id]['lat'], self.station_info[station_id]['lon']
     
     def calculate_max_speed(self):
         # calculate the maximum speed of travel in km / min across all connections, to be used in heuristic calculation
         max_speed_kmm = 0
-        best = (-1,-1,-1)
-        for u in self.adj_list:
+        best = (-1, -1, -1)
+        
+        # Iterate over self.adj from the parent class
+        for u in self.adj:
             lat1, lon1 = self.get_coords(u)
-            for v, weight, line in self.adj_list[u]:
+            for v in self.adj[u]:
+                weight = self.w(u, v) # Fetch weight using parent method
+                line = self.lines[(u, v)]
+                
                 if weight > 0:
                     lat2, lon2 = self.get_coords(v)
                     distance_km = haversine_distance(lat1, lon1, lat2, lon2)
                     speed_kmm = (distance_km / weight)
                     if speed_kmm > max_speed_kmm: 
-                        best = (u,v,line)
+                        best = (u, v, line)
                         max_speed_kmm = speed_kmm
         return (max_speed_kmm, best)
     
@@ -87,18 +95,33 @@ class LondonTubeGraph():
         #  return the time it would take to travel the straight line distance at max speed, as a heuristic for A* search
         dis = haversine_distance(lat1,lon1,lat2,lon2)
         return  (dis / max_speed_kmm) if max_speed_kmm > 0 else float('inf')
+
+    def create_heuristic_dict(self):
+        #  returns a dictionary res where res[u] = the heurestic function starting at node u
+        res = dict()
+        max_speed, _ = self.calculate_max_speed()
+
+        for start_node in self.station_info.keys():
+            h = dict()
+            for destination_node in self.station_info.keys():
+                h[destination_node] = self.calculate_heuristic(start_node, destination_node, max_speed)
+            res[start_node] = h
+        return res
+
     
     def print_station(self,station_id):
         info = self.station_info[station_id]
         print(f"[{station_id}] {info['name']} (Zone {info['zone']})")
-        neighbors = self.adj_list.get(station_id, [])
+        
+        neighbors = self.adj.get(station_id, [])
         if not neighbors:
             print("  -> (No connections found)")
         else:
-            for neighbor_id, time_weight, line in neighbors:
-                # Fetch the neighbor's name for a more readable output
+            for neighbor_id in neighbors:
+                weight = self.w(station_id, neighbor_id)
+                line = self.lines[(station_id, neighbor_id)]
                 neighbor_name = self.station_info[neighbor_id]['name']
-                print(f"  -> to {neighbor_name} (ID: {neighbor_id}) | Time: {time_weight} mins | Line ID: {line}")
+                print(f"  -> to {neighbor_name} (ID: {neighbor_id}) | Time: {weight} mins | Line ID: {line}")
 
 
     def print_graph(self, limit=5):
@@ -107,19 +130,18 @@ class LondonTubeGraph():
         By default, we limit the output to the first 5 stations to avoid flooding the console.
         """
         # Calculate total unique edges (divide by 2 since it's an undirected graph)
-        total_edges = sum(len(neighbors) for neighbors in self.adj_list.values()) // 2
+        total_edges = sum(len(neighbors) for neighbors in self.adj.values()) // 2
         
         print(f"--- Graph Summary ---")
-        print(f"Total Stations (Nodes): {len(self.station_info)}")
+        print(f"Total Stations (Nodes): {self.number_of_nodes()}")
         print(f"Total Connections (Edges): {total_edges}")
         print("-" * 50)
         
         count = 0
-        for station_id, _ in self.station_info.items():
-            if limit is not None and count+1 > limit:
-                print(f"\n... and {len(self.station_info) - limit} more stations.")
+        for station_id in self.station_info.keys():
+            if limit is not None and count + 1 > limit:
+                print(f"\n... and {self.number_of_nodes() - limit} more stations.")
                 break
             self.print_station(station_id)
-            print() # Blank line for visual separation
+            print() 
             count += 1
-
