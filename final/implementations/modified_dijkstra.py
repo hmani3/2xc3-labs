@@ -15,10 +15,15 @@ def dijkstra(G, s, d):
     Q.decrease_key(s, 0)
     dist[s]= 0
 
+    nodes_explored = 0
+
     #Meat of the algorithm
     while not Q.is_empty():
         current_element = Q.extract_min()
         current_node = current_element.value
+
+        nodes_explored += 1
+
 
         if current_node == d: break
 
@@ -38,4 +43,4 @@ def dijkstra(G, s, d):
         path.reverse()
 
     # NEW: Return the 3-tuple needed for the test suite
-    return (pred, path)
+    return (pred, path, nodes_explored)

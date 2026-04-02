@@ -18,10 +18,13 @@ def a_star(G, s, d, h):
     Q.decrease_key(s, h[s])
     dist[s] = 0
 
+
+    nodes_explored = 0
     #Meat of the algorithm
     while not Q.is_empty():
         current_element = Q.extract_min()
         current_node = current_element.value
+        nodes_explored += 1
 
         # if we reach d early exit
         if current_node == d: break
@@ -44,4 +47,4 @@ def a_star(G, s, d, h):
         path.reverse()
         
 
-    return (pred, path)
+    return (pred, path, nodes_explored)

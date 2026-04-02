@@ -1,6 +1,5 @@
 import csv, math
-from collections import defaultdict
-from .final_project_part1 import DirectedWeightedGraph
+from graphs import DirectedWeightedGraph
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Calculate the  distance in km between two points w lat lon, use in heurestic."""
