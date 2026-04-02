@@ -86,6 +86,33 @@ class LondonTubeGraph(DirectedWeightedGraph):
                         max_speed_kmm = speed_kmm
         return (max_speed_kmm, best)
     
+    def count_line_changes(graph, path):
+        """
+        Takes a path (list of station IDs) and calculates the number of line transfers.
+        """
+        if len(path) < 2:
+            return 0
+            
+        transfers = 0
+        # Get the line for the very first jump
+        current_line = graph.lines[(path[0], path[1])]
+        
+        # Walk through the rest of the path
+        for i in range(1, len(path) - 1):
+            u = path[i]
+            v = path[i+1]
+            next_line = graph.lines[(u, v)]
+            
+            # If the line changes, we made a transfer!
+            if next_line != current_line:
+                transfers += 1
+                current_line = next_line
+                
+        return transfers
+    
+
+    # HEURISTIC CALCULATION
+    
     def calculate_heuristic(self, station_id1, station_id2, max_speed_kmm):
         """Calculate heuristic (straight-line distance) between two stations using their lat/lon coordinates for haversine distance
             as well as max potential speed in km / min."""
@@ -108,6 +135,7 @@ class LondonTubeGraph(DirectedWeightedGraph):
             res[start_node] = h
         return res
 
+    # PRINT GRAPH
     
     def print_station(self,station_id):
         """ Print for testing and debugging"""
