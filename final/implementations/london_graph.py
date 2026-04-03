@@ -99,17 +99,32 @@ class LondonTubeGraph(DirectedWeightedGraph):
         dis = haversine_distance(lat1,lon1,lat2,lon2)
         return  (dis / max_speed_kmm) if max_speed_kmm > 0 else float('inf')
 
-    def create_heuristic_dict(self):
-        """ returns a dictionary res where res[u] = the heurestic function starting at node u """
-        res = dict()
-        max_speed, _ = self.calculate_max_speed()
 
-        for start_node in self.station_info.keys():
-            h = dict()
-            for destination_node in self.station_info.keys():
-                h[destination_node] = self.calculate_heuristic(start_node, destination_node, max_speed)
-            res[start_node] = h
-        return res
+    def generate_heuristic_for_destination(self, dest_id: int, max_speed_kmm: float) -> dict:
+        """
+        Dynamically calculates the heuristic for all nodes to a specific destination.
+       implement the real-world overhead A* must pay before routing.
+        """
+        h_dict = {}
+        for node_id in self.station_info.keys():
+            # If it's the destination, distance is 0
+            if node_id == dest_id:
+                h_dict[node_id] = 0.0
+            else:
+                h_dict[node_id] = self.calculate_heuristic(node_id, dest_id, max_speed_kmm)
+                
+        return h_dict
+    # def create_heuristic_dict(self):
+    #     """ returns a dictionary res where res[u] = the heurestic function starting at node u """
+    #     res = dict()
+    #     max_speed, _ = self.calculate_max_speed()
+
+    #     for start_node in self.station_info.keys():
+    #         h = dict()
+    #         for destination_node in self.station_info.keys():
+    #             h[destination_node] = self.calculate_heuristic(start_node, destination_node, max_speed)
+    #         res[start_node] = h
+    #     return res
 
     # PRINT GRAPH
     

@@ -48,3 +48,4 @@ def a_star(G, s, d, h):
         
 
     return (pred, path, nodes_explored)
+
