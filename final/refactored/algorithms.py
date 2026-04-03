@@ -1,6 +1,6 @@
-from interfaces import SPAlgorithm, Graph
-from graphs import HeuristicGraph
-import min_heap
+from .interfaces import SPAlgorithm, Graph
+from .graphs import HeuristicGraph
+from . import min_heap
 
 class Dijkstra(SPAlgorithm):
     def calc_sp(self, graph: Graph, source: int, dest: int) -> float:
@@ -28,7 +28,7 @@ class Dijkstra(SPAlgorithm):
             if current_node == dest: 
                 break
 
-            for neighbour in graph.adjacent_nodes(current_node):
+            for neighbour in graph.get_adj_nodes(current_node):
                 weight = graph.w(current_node, neighbour)
                 if dist[current_node] + weight < dist[neighbour]:
                     Q.decrease_key(neighbour, dist[current_node] + weight)
@@ -70,7 +70,7 @@ class A_Star(SPAlgorithm):
             if current_node == dest: 
                 break
 
-            for neighbour in graph.adjacent_nodes(current_node):
+            for neighbour in graph.get_adj_nodes(current_node):
                 weight = graph.w(current_node, neighbour)
                 # dist tracks the actual travel time (G-score)
                 if dist[current_node] + weight < dist[neighbour]:
@@ -97,10 +97,10 @@ class Bellman_Ford(SPAlgorithm):
         dist[source] = 0
 
         # Bellman-Ford loops V-1 times
-        for _ in range(graph.number_of_nodes() - 1):
+        for _ in range(graph.get_num_of_nodes() - 1):
             for node in nodes:
                 
-                for neighbour in graph.adjacent_nodes(node):
+                for neighbour in graph.get_adj_nodes(node):
                     weight = graph.w(node, neighbour)
                     if dist[node] + weight < dist[neighbour]:
                         dist[neighbour] = dist[node] + weight

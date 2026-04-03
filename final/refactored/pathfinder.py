@@ -1,4 +1,4 @@
-from interfaces import Graph, SPAlgorithm
+from .interfaces import Graph, SPAlgorithm
 
 class ShortPathFinder:
     def __init__(self):

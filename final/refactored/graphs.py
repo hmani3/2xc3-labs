@@ -1,4 +1,4 @@
-from interfaces import Graph
+from .interfaces import Graph
 from typing import Dict, List, Tuple
 
 class DirectedWeightedGraph(Graph):
@@ -42,3 +42,7 @@ class HeuristicGraph(DirectedWeightedGraph):
     def get_heuristic(self) -> Dict[int, float]: return self._heuristic
 
     def set_heuristic(self, heuristic_dict: Dict[int, float]) -> Dict[int, float]: self._heuristic = heuristic_dict
+
+
+
+
