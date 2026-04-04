@@ -1,6 +1,6 @@
 import random
 from implementations.final_project_part1 import *
-from .part1_implementations import *
+from .implementations.part1_implementations import *
 import time
 import matplotlib.pyplot as plt
 
